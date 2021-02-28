@@ -107,18 +107,16 @@ class PuppyRepository {
         ),
     )
 
-    private val breeds = puppies.map { it.breed }.toSortedSet().toList()
-
-    fun getBreeds(): List<String> {
-        return breeds
-    }
-
     fun getPuppies(category: String? = null): List<PuppyModel> {
         if (category.isNullOrBlank()) {
             return puppies
         }
 
         return puppies.filter { it.breed.equals(category, ignoreCase = true) }
+    }
+
+    fun getPuppy(id: String): PuppyModel {
+        return puppies.first { it.id == id }
     }
 
     fun getSuggestedPuppies(): List<PuppyModel> {

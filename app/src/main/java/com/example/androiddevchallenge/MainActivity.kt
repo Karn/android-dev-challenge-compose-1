@@ -69,7 +69,7 @@ fun MyApp() {
                 "details/{puppyId}",
                 arguments = listOf(navArgument("puppyId") { type = NavType.StringType })
             ) { backstackEntry ->
-                DetailsLayout(navController, backstackEntry.arguments?.getString("userId"))
+                DetailsLayout(navController, puppyRepository, backstackEntry.arguments?.getString("puppyId"))
             }
         }
     }
