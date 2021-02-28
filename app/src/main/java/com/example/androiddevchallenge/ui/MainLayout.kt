@@ -21,7 +21,6 @@ import androidx.compose.material.IconToggleButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
@@ -31,17 +30,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.example.androiddevchallenge.R
+import com.example.androiddevchallenge.data.PuppyModel
+import com.example.androiddevchallenge.data.PuppyRepository
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
-fun MainLayout(navController: NavController) {
+fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
     val scrollState = rememberScrollState()
 
     val (searchTerm, updateSearchTerm) = remember { mutableStateOf(TextFieldValue("")) }
@@ -54,16 +54,21 @@ fun MainLayout(navController: NavController) {
             .padding(vertical = 16.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().height(112.dp)
-                .padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxWidth()
+                .padding(16.dp)
         ) {
             // Top Bar
+            Text(
+                text = "Rescue",
+                style = MaterialTheme.typography.h4,
+                modifier = Modifier
+            )
         }
 
         Text(
             text = "Bring home your best friend",
-            style = MaterialTheme.typography.h4,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            style = MaterialTheme.typography.h5,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
         OutlinedTextField(
@@ -72,7 +77,8 @@ fun MainLayout(navController: NavController) {
             onValueChange = updateSearchTerm,
             textStyle = MaterialTheme.typography.subtitle1,
             maxLines = 1,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
 //            imeAction = ImeAction.Search,
 //            onImeActionPerformed = { action, softwareController ->
@@ -85,12 +91,13 @@ fun MainLayout(navController: NavController) {
 
         if (searchTerm.text.isNullOrBlank()) {
             LazyRow(
+                modifier = Modifier.padding(vertical = 8.dp),
                 contentPadding = PaddingValues(16.dp, 0.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items((0..6).map { "category$it" }) { item ->
+                items(puppyRepository.getBreeds()) { breed ->
                     Button(onClick = { /*TODO*/ }) {
-                        Text(text = item)
+                        Text(text = breed)
                     }
                 }
             }
@@ -99,16 +106,15 @@ fun MainLayout(navController: NavController) {
                 text = "For you",
                 style = MaterialTheme.typography.h5,
                 modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .padding(top = 16.dp, bottom = 4.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             )
             LazyRow(
                 contentPadding = PaddingValues(16.dp, 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items((0..6).map { "suggested$it" }) { item ->
+                items(puppyRepository.getSuggestedPuppies()) { item ->
                     Column(modifier = Modifier.clickable {
-                        navController.navigate("details/$item")
+                        navController.navigate("details/${item.id}")
                     }) {
                         Image(
                             modifier = Modifier
@@ -135,12 +141,12 @@ fun MainLayout(navController: NavController) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            (0..6).map { "puppy$it" }.forEach { item ->
+            puppyRepository.getPuppies(searchTerm.text).forEach { puppy ->
                 val isBookmarked = remember { mutableStateOf(false) }
 
                 Row(
                     modifier = Modifier.clickable {
-                        navController.navigate("details/$item")
+                        navController.navigate("details/${puppy.id}")
                     },
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -149,7 +155,7 @@ fun MainLayout(navController: NavController) {
                         painter = painterResource(R.drawable.ic_launcher_background),
                         contentDescription = ""
                     )
-                    Description(data = item, modifier = Modifier.weight(1f))
+                    Description(data = puppy, modifier = Modifier.weight(1f))
                     IconToggleButton(
                         checked = isBookmarked.value,
                         onCheckedChange = {
@@ -167,10 +173,10 @@ fun MainLayout(navController: NavController) {
 }
 
 @Composable
-private fun Description(data: String, modifier: Modifier = Modifier) {
+private fun Description(data: PuppyModel, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text(text = data, style = MaterialTheme.typography.h6)
-        Text(text = "breed", style = MaterialTheme.typography.caption)
-        Text(text = "location", style = MaterialTheme.typography.body1)
+        Text(text = data.name, style = MaterialTheme.typography.h6)
+        Text(text = data.breed, style = MaterialTheme.typography.caption)
+        Text(text = data.shelter, style = MaterialTheme.typography.body1)
     }
 }

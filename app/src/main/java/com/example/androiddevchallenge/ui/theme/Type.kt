@@ -21,16 +21,20 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.androiddevchallenge.R
 
-//private val fonts = FontFamily(
-//    Font(R.font.inter_regular),
-//    Font(R.font.inter_medium, FontWeight.Medium),
-//    Font(R.font.inter_semi_bold, FontWeight.SemiBold),
-//    Font(R.font.inter_bold, FontWeight.Bold)
-//)
+private val fonts = FontFamily(
+    Font(R.font.gentium_book_basic_regular)
+)
 
 // Set of Material typography styles to start with
 val typography = Typography(
+    h4 = TextStyle(
+        fontFamily = fonts,
+        fontWeight = FontWeight.Normal,
+        fontSize = 34.sp,
+        letterSpacing = 0.25.sp
+    ),
     body1 = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,

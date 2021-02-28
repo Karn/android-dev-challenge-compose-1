@@ -28,6 +28,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import com.example.androiddevchallenge.data.PuppyRepository
 import com.example.androiddevchallenge.ui.DetailsLayout
 import com.example.androiddevchallenge.ui.MainLayout
 import com.example.androiddevchallenge.ui.theme.MyTheme
@@ -54,12 +55,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MyApp() {
     val navController = rememberNavController()
+    val puppyRepository = PuppyRepository()
 
     Surface(color = MaterialTheme.colors.background) {
         NavHost(navController, startDestination = "overview") {
             // The main view
             composable("overview") {
-                MainLayout(navController)
+                MainLayout(navController, puppyRepository)
             }
 
             // The details
