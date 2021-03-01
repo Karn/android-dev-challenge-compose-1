@@ -1,7 +1,5 @@
 package com.example.androiddevchallenge.data
 
-import java.util.*
-
 data class PuppyModel(
     val id: String,
     val name: String,
@@ -12,6 +10,7 @@ data class PuppyModel(
     val characteristics: String,
     val images: List<String>,
     val shelter: String,
+    var liked: Boolean = false,
 )
 
 class PuppyRepository {
@@ -107,16 +106,30 @@ class PuppyRepository {
         ),
     )
 
-    fun getPuppies(category: String? = null): List<PuppyModel> {
-        if (category.isNullOrBlank()) {
-            return puppies
+    fun getPuppies(filter: String, onlyLiked: Boolean = false): List<PuppyModel> {
+        if (filter.isBlank()) {
+            return puppies.filter { if (onlyLiked) it.liked else true }
         }
 
-        return puppies.filter { it.breed.equals(category, ignoreCase = true) }
+        return puppies.filter {
+            val queryMatch = it.name.contains(filter, ignoreCase = true)
+                    || it.breed.contains(filter, ignoreCase = true)
+                    || it.characteristics.contains(filter, ignoreCase = true)
+
+            if (onlyLiked) {
+                return@filter it.liked && queryMatch
+            }
+
+            return@filter queryMatch
+        }
     }
 
     fun getPuppy(id: String): PuppyModel {
         return puppies.first { it.id == id }
+    }
+
+    fun setPuppyLiked(id: String, liked: Boolean) {
+        puppies.firstOrNull { it.id == id }?.liked = liked
     }
 
     fun getSuggestedPuppies(): List<PuppyModel> {

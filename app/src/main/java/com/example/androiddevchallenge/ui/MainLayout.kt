@@ -1,5 +1,6 @@
 package com.example.androiddevchallenge.ui
 
+import android.accessibilityservice.AccessibilityService
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.BorderStroke
@@ -22,12 +23,14 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.IconToggleButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RadioButton
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -41,6 +44,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -77,8 +82,11 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
             modifier = Modifier.padding(horizontal = 16.dp)
         )
 
+        Spacer(modifier = Modifier.height(32.dp))
+
         // Search
-        // TODO: On focus only show the vertical list
+        // TODO: On focus only show the vertical list, also when focused change color to primary
+        val focusManager = LocalFocusManager.current
         BasicTextField(
             value = searchTerm,
             onValueChange = updateSearchTerm,
@@ -112,31 +120,43 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
                     }
                 }
             },
-//            imeAction = ImeAction.Search,
-//            onImeActionPerformed = { action, softwareController ->
-//                if (action == ImeAction.Search) {
-//                    softwareController.hideSoftwareKeyboard()
-//                    // do something here
-//                }
-//            }
+            keyboardOptions = KeyboardOptions.Default.copy(
+                imeAction = ImeAction.Search
+            ),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    focusManager.clearFocus()
+                }
+            )
         )
 
         val selectedView = remember { mutableStateOf(0) }
 
+        // TODO: Clean this up into an actual Toggle Item
         Row(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Button(onClick = { selectedView.value = 0 }) {
+            Button(
+                onClick = { selectedView.value = 0 },
+                elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp),
+                border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+                colors = if (selectedView.value == 0) ButtonDefaults.buttonColors() else ButtonDefaults.outlinedButtonColors()
+            ) {
                 Text(text = "All", style = MaterialTheme.typography.body1)
             }
-            Button(onClick = { selectedView.value = 1 }) {
+            Button(
+                onClick = { selectedView.value = 1 },
+                elevation = ButtonDefaults.elevation(0.dp, 0.dp, 0.dp),
+                border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+                colors = if (selectedView.value == 1) ButtonDefaults.buttonColors() else ButtonDefaults.outlinedButtonColors()
+            ) {
                 Text(text = "Liked", style = MaterialTheme.typography.body1)
             }
         }
 
         AnimatedVisibility(visible = searchTerm.text.isBlank() && selectedView.value == 0) {
-            Column {
+            Column(modifier = Modifier.padding(vertical = 16.dp)) {
                 Text(
                     text = "New comers",
                     style = MaterialTheme.typography.h6,
@@ -188,43 +208,35 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            puppyRepository.getPuppies(searchTerm.text).forEach { puppy ->
-                val isBookmarked = remember { mutableStateOf(false) }
+            // Is this working as expected?
+            val puppyData = puppyRepository.getPuppies(searchTerm.text, selectedView.value == 1)
+            // TODO: Empty state
 
-                Row(
-                    modifier = Modifier.clickable {
-                        navController.navigate("details/${puppy.id}")
-                    },
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    CoilImage(
-                        data = puppy.images.first(),
-                        modifier = Modifier.size(75.dp)
-                            .clip(MaterialTheme.shapes.medium),
-                        contentScale = ContentScale.Crop,
-                        contentDescription = "",
-                        fadeIn = true,
-                        loading = {
-                            Spacer(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(MaterialTheme.colors.surface)
-                            )
-                        }
+            if (puppyData.isEmpty()) {
+                // Show empty state
+
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    // TODO: Add image
+                    Text(
+                        text = if (searchTerm.text.isNotEmpty())
+                            "No puppies matched your search query"
+                        else
+                            "You have no puppies in your Liked list",
+                        style = MaterialTheme.typography.body1,
                     )
-                    Description(data = puppy, modifier = Modifier.weight(1f))
-                    IconToggleButton(
-                        checked = isBookmarked.value,
-                        onCheckedChange = {
-                            isBookmarked.value = !isBookmarked.value
-                        }) {
-                        Icon(
-                            imageVector = if (isBookmarked.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
-                            contentDescription = ""
-                        )
-                    }
+                }
+            } else {
+                PuppyList(navController, puppyData) { id, liked ->
+                    puppyRepository.setPuppyLiked(id, liked)
                 }
             }
+        }
+
+        Column(
+            modifier = Modifier
+                .background(MaterialTheme.colors.onBackground.copy(alpha = 0.1f))
+        ) {
+            // Credits page
         }
     }
 }
@@ -235,5 +247,51 @@ private fun Description(data: PuppyModel, modifier: Modifier = Modifier) {
         Text(text = data.name, style = MaterialTheme.typography.body1)
         Text(text = data.breed, style = MaterialTheme.typography.body2)
         Text(text = data.shelter, style = MaterialTheme.typography.body2)
+    }
+}
+
+@Composable
+private fun PuppyList(
+    navController: NavController,
+    data: List<PuppyModel>,
+    onLikeChanged: (String, Boolean) -> Unit = { id, liked -> }
+) {
+    data.forEach { puppy ->
+        val isBookmarked = mutableStateOf(puppy.liked)
+
+        Row(
+            modifier = Modifier.clickable {
+                navController.navigate("details/${puppy.id}")
+            },
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CoilImage(
+                data = puppy.images.first(),
+                modifier = Modifier.size(75.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                contentScale = ContentScale.Crop,
+                contentDescription = "",
+                loading = {
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colors.onBackground.copy(alpha = 0.1f))
+                    )
+                }
+            )
+            Description(data = puppy, modifier = Modifier.weight(1f))
+            IconToggleButton(
+                checked = isBookmarked.value,
+                onCheckedChange = {
+                    isBookmarked.value = !isBookmarked.value
+                    onLikeChanged(puppy.id, isBookmarked.value)
+                }) {
+                Icon(
+                    imageVector = if (isBookmarked.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    tint = MaterialTheme.colors.primary,
+                    contentDescription = ""
+                )
+            }
+        }
     }
 }

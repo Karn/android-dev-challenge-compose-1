@@ -13,10 +13,17 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.IconToggleButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -46,14 +53,15 @@ fun DetailsLayout(navController: NavController, puppyRepository: PuppyRepository
     ) {
         // Images
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             items(puppy.images) { url ->
                 CoilImage(
                     data = url,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(250.dp),
+                        .height(250.dp)
+                        .clip(MaterialTheme.shapes.medium),
                     contentScale = ContentScale.Crop,
                     contentDescription = "",
                     fadeIn = true,
@@ -68,7 +76,32 @@ fun DetailsLayout(navController: NavController, puppyRepository: PuppyRepository
             }
         }
 
-        Description(data = puppy, modifier = Modifier.padding(horizontal = 16.dp))
+        val isBookmarked = mutableStateOf(puppy.liked)
+
+        Row(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp)
+        ) {
+            Description(
+                data = puppy,
+                modifier = Modifier
+                    .weight(1f)
+            )
+            IconToggleButton(
+                checked = isBookmarked.value,
+                onCheckedChange = {
+                    isBookmarked.value = !isBookmarked.value
+                    puppyRepository.setPuppyLiked(puppy.id, isBookmarked.value)
+                }) {
+                Icon(
+                    imageVector = if (isBookmarked.value) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    tint = MaterialTheme.colors.primary,
+                    contentDescription = ""
+                )
+            }
+        }
+
 
         Row {
             // Scrollable description of key details
