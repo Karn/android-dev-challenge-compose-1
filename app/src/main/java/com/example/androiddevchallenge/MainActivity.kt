@@ -75,7 +75,6 @@ fun MyApp() {
     }
 }
 
-
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Composable
 fun LightPreview() {
