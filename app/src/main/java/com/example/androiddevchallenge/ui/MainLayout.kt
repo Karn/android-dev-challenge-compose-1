@@ -52,6 +52,8 @@ import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.House
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -219,13 +221,6 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
                                 contentScale = ContentScale.Crop,
                                 contentDescription = "",
                                 fadeIn = true,
-                                loading = {
-                                    Spacer(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(MaterialTheme.colors.surface)
-                                    )
-                                }
                             )
                             Description(
                                 data = puppy,
@@ -287,17 +282,40 @@ private fun Description(data: PuppyModel, modifier: Modifier = Modifier) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        Text(
-            text = "${data.breed} - ${data.color}",
-            style = MaterialTheme.typography.body2,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Text(
-            text = data.shelter, style = MaterialTheme.typography.body2,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Row {
+            Icon(
+                imageVector = Icons.Default.Pets,
+                contentDescription = "",
+                tint = MaterialTheme.colors.onBackground,
+                modifier = Modifier
+                    .size(12.dp)
+                    .align(Alignment.CenterVertically)
+            )
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = "${data.breed} - ${data.color}",
+                style = MaterialTheme.typography.body2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Row {
+            Icon(
+                imageVector = Icons.Default.House,
+                contentDescription = "",
+                tint = MaterialTheme.colors.onBackground,
+                modifier = Modifier
+                    .size(12.dp)
+                    .align(Alignment.CenterVertically)
+            )
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = data.shelter,
+                style = MaterialTheme.typography.body2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 

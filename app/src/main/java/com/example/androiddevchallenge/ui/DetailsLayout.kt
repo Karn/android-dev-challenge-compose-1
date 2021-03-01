@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -46,6 +47,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.House
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
@@ -249,17 +252,40 @@ private fun Description(data: PuppyModel, modifier: Modifier = Modifier) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
-        Text(
-            text = "${data.breed} - ${data.color}",
-            style = MaterialTheme.typography.body2,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
-        Text(
-            text = data.shelter, style = MaterialTheme.typography.body2,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        Row {
+            Icon(
+                imageVector = Icons.Default.Pets,
+                contentDescription = "",
+                tint = MaterialTheme.colors.onBackground,
+                modifier = Modifier
+                    .size(12.dp)
+                    .align(Alignment.CenterVertically)
+            )
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = "${data.breed} - ${data.color}",
+                style = MaterialTheme.typography.body2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+        Row {
+            Icon(
+                imageVector = Icons.Default.House,
+                contentDescription = "",
+                tint = MaterialTheme.colors.onBackground,
+                modifier = Modifier
+                    .size(12.dp)
+                    .align(Alignment.CenterVertically)
+            )
+            Text(
+                modifier = Modifier.padding(start = 4.dp),
+                text = data.shelter,
+                style = MaterialTheme.typography.body2,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
