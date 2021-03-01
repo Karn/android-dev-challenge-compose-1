@@ -20,6 +20,8 @@ data class PuppyModel(
     val name: String,
     val breed: String,
     val gender: String,
+    val age: String,
+    val weight: String,
     val color: String,
     val health: String,
     val characteristics: String,
@@ -36,6 +38,8 @@ class PuppyRepository {
             name = "Jacinta",
             breed = "Mixed Breed",
             gender = "Female",
+            age = "",
+            weight = "",
             color = "Black, Brown / Chocolate",
             health = "Vaccinations up to date, spayed / neutered",
             images = listOf(
@@ -51,6 +55,8 @@ class PuppyRepository {
             name = "Boop",
             breed = "Mixed Breed",
             gender = "Male",
+            age = "",
+            weight = "",
             color = "Bicolor",
             health = "Spayed / neutered",
             images = listOf(
@@ -66,6 +72,8 @@ class PuppyRepository {
             name = "Yoshio",
             breed = "Shepherd Mix",
             gender = "Male",
+            age = "",
+            weight = "",
             color = "Black, Golden",
             health = "Vaccinations up to date, spayed / neutered",
             images = listOf(
@@ -81,6 +89,8 @@ class PuppyRepository {
             name = "Dorian",
             breed = "Street Mix / North York",
             gender = "Male",
+            age = "",
+            weight = "",
             color = "Brown / Chocolate",
             health = "Vaccinations up to date, spayed / neutered",
             images = listOf(
@@ -96,6 +106,8 @@ class PuppyRepository {
             name = "Boomba",
             breed = "Mixed Breed",
             gender = "Female",
+            age = "",
+            weight = "",
             color = "Tricolor (Brown, Black, & White)",
             health = "Vaccinations up to date, spayed / neutered",
             images = listOf(
@@ -111,6 +123,8 @@ class PuppyRepository {
             name = "Lotto",
             breed = "Mixed Breed",
             gender = "Male",
+            age = "",
+            weight = "",
             color = "Black",
             health = "Vaccinations up to date, spayed / neutered",
             images = listOf(

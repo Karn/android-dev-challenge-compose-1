@@ -18,9 +18,15 @@ package com.example.androiddevchallenge
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
@@ -31,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.androiddevchallenge.data.PuppyRepository
 import com.example.androiddevchallenge.ui.DetailsLayout
 import com.example.androiddevchallenge.ui.MainLayout
+import com.example.androiddevchallenge.ui.SettingsLayout
 import com.example.androiddevchallenge.ui.theme.MyTheme
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 
@@ -43,8 +50,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ProvideWindowInsets {
-                MyTheme {
-                    MyApp()
+                val themeConfig = remember { mutableStateOf(Pair(true, false)) }
+                val (useSystemSettings, darkMode) = themeConfig.value
+
+                MyTheme(if (useSystemSettings) isSystemInDarkTheme() else darkMode) {
+                    MyApp(themeConfig)
                 }
             }
         }
@@ -53,11 +63,14 @@ class MainActivity : ComponentActivity() {
 
 // Start building your app here!
 @Composable
-fun MyApp() {
+fun MyApp(themeConfig: MutableState<Pair<Boolean, Boolean>>) {
     val navController = rememberNavController()
     val puppyRepository = PuppyRepository()
 
-    Surface(color = MaterialTheme.colors.background) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colors.background
+    ) {
         NavHost(navController, startDestination = "overview") {
             // The main view
             composable("overview") {
@@ -69,7 +82,16 @@ fun MyApp() {
                 "details/{puppyId}",
                 arguments = listOf(navArgument("puppyId") { type = NavType.StringType })
             ) { backstackEntry ->
-                DetailsLayout(navController, puppyRepository, backstackEntry.arguments?.getString("puppyId"))
+                DetailsLayout(
+                    navController,
+                    puppyRepository,
+                    backstackEntry.arguments?.getString("puppyId")
+                )
+            }
+
+            // Settings
+            composable("settings") {
+                SettingsLayout(navController, themeConfig)
             }
         }
     }
@@ -79,7 +101,7 @@ fun MyApp() {
 @Composable
 fun LightPreview() {
     MyTheme {
-        MyApp()
+        MyApp(mutableStateOf(Pair(false, false)))
     }
 }
 
@@ -87,6 +109,6 @@ fun LightPreview() {
 @Composable
 fun DarkPreview() {
     MyTheme(darkTheme = true) {
-        MyApp()
+        MyApp(mutableStateOf(Pair(false, true)))
     }
 }

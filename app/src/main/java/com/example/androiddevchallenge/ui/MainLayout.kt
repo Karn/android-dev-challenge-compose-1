@@ -47,16 +47,21 @@ import androidx.compose.material.IconToggleButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.contentColorFor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
@@ -66,6 +71,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.example.androiddevchallenge.data.PuppyModel
 import com.example.androiddevchallenge.data.PuppyRepository
+import com.example.androiddevchallenge.ui.common.Title
 import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
@@ -82,21 +88,30 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
             .statusBarsPadding()
             .navigationBarsPadding()
             .verticalScroll(scrollState)
-            .padding(vertical = 16.dp)
     ) {
         // Top Bar
-        Text(
-            text = "Rescue",
-            style = MaterialTheme.typography.h3,
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-        Text(
-            text = "Bring home your best friend",
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier.padding(horizontal = 16.dp)
+        TopAppBar(
+            title = {},
+            elevation = 0.dp,
+            backgroundColor = Color.Transparent,
+            contentColor = contentColorFor(MaterialTheme.colors.background),
+            navigationIcon = {
+            },
+            actions = {
+                Icon(
+                    imageVector = Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = MaterialTheme.colors.onBackground,
+                    modifier = Modifier
+                        .clickable {
+                            navController.navigate("settings")
+                        }
+                        .padding(horizontal = 16.dp)
+                )
+            }
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Title()
 
         // Search
         // TODO: On focus only show the vertical list, also when focused change color to primary
@@ -104,17 +119,21 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
         BasicTextField(
             value = searchTerm,
             onValueChange = updateSearchTerm,
-            textStyle = MaterialTheme.typography.body2,
-            // maxLines = 1,
+            textStyle = MaterialTheme.typography.body2.copy(
+                color = contentColorFor(MaterialTheme.colors.background)
+            ),
+            maxLines = 1,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 8.dp),
+            cursorBrush = SolidColor(contentColorFor(MaterialTheme.colors.background)),
             decorationBox = { innerTextField ->
                 Surface(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.medium)
                         .border(BorderStroke(2.dp, MaterialTheme.colors.onBackground))
-                        .padding(vertical = 8.dp, horizontal = 8.dp)
+                        .padding(vertical = 8.dp, horizontal = 8.dp),
+                    contentColor = contentColorFor(MaterialTheme.colors.background)
                 ) {
                     Row {
                         Icon(
@@ -221,7 +240,7 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
                 .padding(top = 16.dp, bottom = 4.dp)
         )
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             // Is this working as expected?
@@ -231,7 +250,11 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
             if (puppyData.isEmpty()) {
                 // Show empty state
 
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                ) {
                     // TODO: Add image
                     Text(
                         text = if (searchTerm.text.isNotEmpty())
@@ -246,13 +269,6 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
                     puppyRepository.setPuppyLiked(id, liked)
                 }
             }
-        }
-
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colors.onBackground.copy(alpha = 0.1f))
-        ) {
-            // Credits page
         }
     }
 }
@@ -276,10 +292,13 @@ private fun PuppyList(
         val isBookmarked = mutableStateOf(puppy.liked)
 
         Row(
-            modifier = Modifier.clickable {
-                navController.navigate("details/${puppy.id}")
-            },
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("details/${puppy.id}")
+                }
+                .padding(vertical = 4.dp)
+                .padding(start = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             CoilImage(
                 data = puppy.images.first(),
@@ -295,7 +314,12 @@ private fun PuppyList(
                     )
                 }
             )
-            Description(data = puppy, modifier = Modifier.weight(1f))
+            Description(
+                data = puppy,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+            )
             IconToggleButton(
                 checked = isBookmarked.value,
                 onCheckedChange = {

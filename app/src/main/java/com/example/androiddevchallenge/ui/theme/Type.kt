@@ -20,6 +20,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.example.androiddevchallenge.R
 
 private val display = FontFamily(
@@ -37,13 +38,14 @@ val typography = Typography(
     // Display
     h3 = defaultType.h3.merge(
         TextStyle(
-            fontFamily = display
+            fontFamily = display,
         )
     ),
     // Title
     h6 = defaultType.h6.merge(
         TextStyle(
-            fontFamily = display
+            fontFamily = display,
+            letterSpacing = 1.5.sp
         )
     ),
     // Paragraph bold
