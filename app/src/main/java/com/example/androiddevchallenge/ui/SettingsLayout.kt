@@ -134,6 +134,14 @@ fun SettingsLayout(
                 .padding(horizontal = 16.dp)
                 .padding(top = 16.dp, bottom = 4.dp)
         )
+
+        Text(
+            text = "Libraries",
+            style = MaterialTheme.typography.h6,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 16.dp, bottom = 4.dp)
+        )
     }
 }
 

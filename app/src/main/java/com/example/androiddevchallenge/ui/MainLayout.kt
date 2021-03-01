@@ -66,6 +66,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
@@ -203,14 +204,16 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
                     // Filter to most recent 5
                     items(puppyRepository.getSuggestedPuppies()) { puppy ->
                         Column(
-                            modifier = Modifier.clickable {
-                                navController.navigate("details/${puppy.id}")
-                            }
+                            modifier = Modifier
+                                .width(200.dp)
+                                .clickable {
+                                    navController.navigate("details/${puppy.id}")
+                                }
                         ) {
                             CoilImage(
-                                data = puppy.images.first(),
+                                data = puppy.images.first().first,
                                 modifier = Modifier
-                                    .width(200.dp)
+                                    .fillMaxWidth()
                                     .height(150.dp)
                                     .clip(MaterialTheme.shapes.medium),
                                 contentScale = ContentScale.Crop,
@@ -224,7 +227,10 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
                                     )
                                 }
                             )
-                            Description(data = puppy)
+                            Description(
+                                data = puppy,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
                             // TODO: Add the like button
                         }
                     }
@@ -276,9 +282,22 @@ fun MainLayout(navController: NavController, puppyRepository: PuppyRepository) {
 @Composable
 private fun Description(data: PuppyModel, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
-        Text(text = data.name, style = MaterialTheme.typography.body1)
-        Text(text = data.breed, style = MaterialTheme.typography.body2)
-        Text(text = data.shelter, style = MaterialTheme.typography.body2)
+        Text(
+            text = data.name, style = MaterialTheme.typography.body1,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = "${data.breed} - ${data.color}",
+            style = MaterialTheme.typography.body2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = data.shelter, style = MaterialTheme.typography.body2,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -301,7 +320,7 @@ private fun PuppyList(
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             CoilImage(
-                data = puppy.images.first(),
+                data = puppy.images.first().first,
                 modifier = Modifier.size(75.dp)
                     .clip(MaterialTheme.shapes.medium),
                 contentScale = ContentScale.Crop,
