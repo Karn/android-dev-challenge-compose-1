@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.androiddevchallenge.data.PuppyModel
 import com.example.androiddevchallenge.ui.common.Title
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
@@ -136,20 +135,14 @@ fun SettingsLayout(
         )
 
         Text(
-            text = "Libraries",
-            style = MaterialTheme.typography.h6,
+            text = """
+                • Petfinder.ca -- source puppy data and images.
+                • Katheleen (https://dribbble.com/katheleen-lmr) -- for app design inspiration; https://dribbble.com/shots/11078244-Pet-Adoption-App-Concept/attachments/2675838?mode=media
+                • Jetpack Compose Samples, Owl -- https://github.com/android/compose-samples/tree/main/Owl
+            """.trimIndent(),
+            style = MaterialTheme.typography.body2,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
-                .padding(top = 16.dp, bottom = 4.dp)
         )
-    }
-}
-
-@Composable
-private fun Description(data: PuppyModel, modifier: Modifier = Modifier) {
-    Column(modifier = modifier) {
-        Text(text = data.name, style = MaterialTheme.typography.body1)
-        Text(text = data.breed, style = MaterialTheme.typography.body2)
-        Text(text = data.shelter, style = MaterialTheme.typography.body2)
     }
 }

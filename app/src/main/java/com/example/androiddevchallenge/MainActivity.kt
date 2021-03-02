@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ProvideWindowInsets {
-                val themeConfig = remember { mutableStateOf(Pair(true, false)) }
+                val themeConfig = remember { mutableStateOf(Pair(false, false)) }
                 val (useSystemSettings, darkMode) = themeConfig.value
 
                 MyTheme(if (useSystemSettings) isSystemInDarkTheme() else darkMode) {
